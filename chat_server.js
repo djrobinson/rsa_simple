@@ -37,6 +37,32 @@ const generateRandomPrime = (max) => {
     }
 }
 
+const inverseModulus = (a, b) => {
+    const x = [];
+    const y = [];
+    console.log('X & Y', x, y);
+    const quotient = a / b;
+    const remainder = a % b;
+    let reassignA = a;
+    let reassignB = b;
+
+    x[0] = 0;
+    y[0] = 1;
+    x[1] = 1;
+    y[1] = quotient * -1;
+
+    for (let i = 2; (b % (a%b)) !== 0; i++) {
+        reassignA = reassignB;
+        reassignB = remainder;
+        console.log('X & Y', x, y);
+        x[i % 3] = (quotient * -1 * x[(i - 1) % 3]) + x[(i - 2) % 3];
+        y[i % 3] = (quotient * -1 * y[(i - 1) % 3]) + y[(i - 2) % 3];
+    }
+    console.log('X & Y', x, y);
+
+    return x[(i - 1) % 3];
+}
+
 
 const scrambler = (plainText) => {
     console.log(plainText.toUpperCase());
@@ -55,6 +81,10 @@ const scrambler = (plainText) => {
     const e = generateRelativePrime(t, isMore);
 
     console.log('P, Q, N, T, E:', p, q, n, t, e);
+
+    const inverseMod = inverseModulus(11, 840);
+
+    console.log('Inverse Mod Test:', inverseMod);
 
 
     // Find a d (Will require extra calc: http://www.pagedon.com/extended-euclidean-algorithm-in-c/my_programming/
