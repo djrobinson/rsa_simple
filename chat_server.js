@@ -1,9 +1,15 @@
 const net = require('net')
+const math = require('mathjs');
+
+math.config({
+    number: 'BigNumber',
+    precision: 64
+})
 
 const server = net.createServer();
 
 const sockets = [];
-//Test//
+
 //*********** Private/Public Key Setup ****************//
 const isPrime = (number) => {
     for ( var i = 2; i < number; i++ ) {
@@ -37,31 +43,42 @@ const generateRandomPrime = (max) => {
     }
 }
 
+const checkZero = (a, b) => {
+    const bMod = math.mod(math.bignumber(a), math.bignumber(b));
+    const modulus = math.mod(math.bignumber(b), math.bignumber(bMod));
+    return modulus.toString();
+}
+
 const inverseModulus = (a, b) => {
     const x = [];
     const y = [];
-    console.log('X & Y', x, y);
-    const quotient = a / b;
-    const remainder = a % b;
-    let reassignA = a;
-    let reassignB = b;
+    let quotient = math.divide(math.bignumber(a), math.bignumber(b));
+    let remainder = math.mod(math.bignumber(a), math.bignumber(b));
+
 
     x[0] = 0;
     y[0] = 1;
     x[1] = 1;
     y[1] = quotient * -1;
+    let i = 2
 
-    for (let i = 2; (b % (a%b)) !== 0; i++) {
-        reassignA = reassignB;
-        reassignB = remainder;
-        console.log('X & Y', x, y);
-        x[i % 3] = (quotient * -1 * x[(i - 1) % 3]) + x[(i - 2) % 3];
-        y[i % 3] = (quotient * -1 * y[(i - 1) % 3]) + y[(i - 2) % 3];
+    for (; checkZero(a, b) !== '0'; i++) {
+        const checker = math.mod(math.bignumber(b), math.mod(math.bignumber(a), math.bignumber(b)));
+        console.log('Checker: ', checker.toString());
+        a = b;
+        b = remainder;
+        quotient = math.floor(math.divide(math.bignumber(a), math.bignumber(b)));
+        remainder = math.mod(math.bignumber(a), math.bignumber(b));
+        console.log('X & Y', x, y, 'Quotient: ', quotient.toString());
+        x[math.mod(i, 3)] = (quotient * -1 * x[math.bignumber((i - 1)) % math.bignumber(3)]) + x[math.bignumber((i - 2)) % math.bignumber(3)];
+        y[math.mod(i, 3)] = (quotient * -1 * y[math.bignumber((i - 1)) % math.bignumber(3)]) + y[math.bignumber((i - 2)) % math.bignumber(3)];
     }
     console.log('X & Y', x, y);
 
     return x[(i - 1) % 3];
 }
+
+
 
 
 const scrambler = (plainText) => {
@@ -85,9 +102,6 @@ const scrambler = (plainText) => {
     const inverseMod = inverseModulus(11, 840);
 
     console.log('Inverse Mod Test:', inverseMod);
-
-
-    // Find a d (Will require extra calc: http://www.pagedon.com/extended-euclidean-algorithm-in-c/my_programming/
 
 }
 

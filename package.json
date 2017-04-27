@@ -1,0 +1,23 @@
+{
+  "name": "rsa-chat",
+  "version": "1.0.0",
+  "description": "simple rsa chat server",
+  "main": "chat_server.js",
+  "dependencies": {
+    "mathjs": "^3.12.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/djrobinson/rsa_simple.git"
+  },
+  "author": "djrobinson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/djrobinson/rsa_simple/issues"
+  },
+  "homepage": "https://github.com/djrobinson/rsa_simple#readme"
+}
