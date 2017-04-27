@@ -1,35 +1,41 @@
-var net = require('net')
+const net = require('net')
 
-var server = net.createServer();
+const server = net.createServer();
 
-var sockets = [];
+const sockets = [];
 
-server.on('connection', function(socket) {
+const scrambler = (plainText) => {
+    console.log(plainText.toUpperCase());
+}
+
+server.on('connection', (socket) => {
     console.log('new connection');
 
     sockets.push(socket);
 
-    socket.on('data', function(data) {
-        console.log('Received message: ', data);
-        sockets.forEach(function(otherSocket) {
+    socket.on('data', (data) => {
+        console.log('Received message: ', data.toString());
+        sockets.forEach((otherSocket) => {
+            const stringData = data.toString();
+            scrambler(stringData);
             if (otherSocket !== socket) {
                 otherSocket.write(data);
             }
         });
     });
 
-    socket.on('close', function() {
+    socket.on('close', () => {
         console.log('connection closed');
-        var index = sockets.indexOf(socket);
+        const index = sockets.indexOf(socket);
         sockets.splice(index, 1);
     });
 });
 
-server.on('error', function(err) {
+server.on('error', (err) => {
     console.log('Server error', err.message);
 });
 
-server.on('close', function() {
+server.on('close', () => {
     console.log('Server closed');
 });
 
