@@ -44,16 +44,16 @@ const generateRandomPrime = (max) => {
 }
 
 const checkZero = (a, b) => {
-    const bMod = math.mod(math.bignumber(a), math.bignumber(b));
-    const modulus = math.mod(math.bignumber(b), math.bignumber(bMod));
+    const bMod = math.mod(a, b);
+    const modulus = math.mod(b, bMod);
     return modulus.toString();
 }
 
 const inverseModulus = (a, b) => {
     const x = [];
     const y = [];
-    let quotient = math.divide(math.bignumber(a), math.bignumber(b));
-    let remainder = math.mod(math.bignumber(a), math.bignumber(b));
+    let quotient = math.divide(a, b);
+    let remainder = math.mod(a, b);
 
 
     x[0] = 0;
@@ -63,15 +63,15 @@ const inverseModulus = (a, b) => {
     let i = 2
 
     for (; checkZero(a, b) !== '0'; i++) {
-        const checker = math.mod(math.bignumber(b), math.mod(math.bignumber(a), math.bignumber(b)));
+        const checker = math.mod(b, math.mod(a, b));
         console.log('Checker: ', checker.toString());
         a = b;
         b = remainder;
-        quotient = math.floor(math.divide(math.bignumber(a), math.bignumber(b)));
-        remainder = math.mod(math.bignumber(a), math.bignumber(b));
+        quotient = math.floor(math.divide(a, b));
+        remainder = math.mod(a, b);
         console.log('X & Y', x, y, 'Quotient: ', quotient.toString());
-        x[math.mod(i, 3)] = (quotient * -1 * x[math.bignumber((i - 1)) % math.bignumber(3)]) + x[math.bignumber((i - 2)) % math.bignumber(3)];
-        y[math.mod(i, 3)] = (quotient * -1 * y[math.bignumber((i - 1)) % math.bignumber(3)]) + y[math.bignumber((i - 2)) % math.bignumber(3)];
+        x[math.mod(i, 3)] = (quotient * -1 * x[(i - 1) % 3]) + x[(i - 2) % 3];
+        y[math.mod(i, 3)] = (quotient * -1 * y[(i - 1) % 3]) + y[(i - 2) % 3];
     }
     console.log('X & Y', x, y);
 
