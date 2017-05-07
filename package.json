@@ -4,7 +4,9 @@
   "description": "simple rsa chat server",
   "main": "chat_server.js",
   "dependencies": {
-    "mathjs": "^3.12.1"
+    "httpd": "0.0.2",
+    "mathjs": "^3.12.1",
+    "socket.io": "^1.7.4"
   },
   "devDependencies": {},
   "scripts": {

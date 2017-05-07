@@ -8,7 +8,7 @@
     }
     #messages {
         position: fixed;
-        top: 40px;
+        top: 200px;
         bottom: 8px;
         left: 8px;
         right: 8px;
@@ -23,24 +23,29 @@
 
     <div id="messages"></div>
 
-    <script src="http://localhost:4000/socket.io/socket.io/socket.io.js"></script>
+    <script src="http://localhost:4000/socket.io/socket.io.js"></script>
     <script type="text/javascript">
 
+    var messagesElement = document.getElementById('messages');
+    var lastMessageElement = null;
+
     function addMessage(message) {
-        var messagesElement = document.getElementById('div');
-        var newMessagesText = document.getElementById(message)
+        console.log('Adding message', message);
+        var newMessageElement = document.createElement('div');
+        var newMessagesText = document.createTextNode(message)
 
         newMessageElement.appendChild(newMessagesText);
-        newMessageElement.insertBefore(messagesElement, lastMessageElement);
+        messagesElement.insertBefore(newMessageElement, lastMessageElement);
         lastMessageElement = newMessageElement
     }
     var socket = io.connect('http://localhost:4000');
     socket.on('serverMessage', function(content) {
+        console.log('Server message???', content);
         addMessage(content);
     });
 
     socket.on('login', function() {
-        var usernmae = prompt('What username would you like to use?');
+        var username = prompt('What username would you like to use?');
         socket.emit('login', username);
     });
 
@@ -52,7 +57,7 @@
         }
     }
 
-    function snedMessge(message) {
+    function sendMessage(message) {
         var commandMatch = message.match(/^\/(\w*)(.*)/);
         if (commandMatch) {
             sendCommand(commandMatch[1], commandMatch[2].trim());
@@ -65,7 +70,7 @@
 
     inputElement.onkeydown = function(keyboardEvent) {
         if (keyboardEvent.keyCode === 13) {
-            sendMessge(inputElement.value);
+            sendMessage(inputElement.value);
             inputElement.value = '';
             return false;
         } else {

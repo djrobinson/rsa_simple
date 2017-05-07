@@ -1,5 +1,8 @@
 const net = require('net')
 const math = require('mathjs');
+const http = require('http');
+const fs = require('fs');
+
 
 math.config({
     number: 'BigNumber',
@@ -115,6 +118,7 @@ const decrypt = (data) => {
     //  M = Cd mod n
 }
 
+
 //****************** Simple TCP **********************//
 
 server.on('connection', (socket) => {
@@ -153,6 +157,47 @@ server.on('close', () => {
 //*****************************************************//
 
 //****************** Simple HTTP **********************//
+
+const handler = (req, res) => {
+    fs.readFile(__dirname + '/chat_client.html',
+        (err, data) => {
+            if (err) {
+                res.writeHead(500);
+                return res.end('Error loading index.html');
+            }
+            res.writeHead(200);
+            res.end(data);
+        }
+    )
+}
+
+const httpd = http.createServer(handler);
+httpd.listen(4000);
+const io = require('socket.io').listen(httpd);
+
+io.sockets.on('connection', (socket) => {
+    socket.on('clientMessage', (content) => {
+        console.log('Incoming message', content);
+        socket.emit('serverMessage', 'Your said' + content);
+
+        socket.on('username', (err, username) => {
+            if (!username) {
+                username = socket.id;
+            }
+        })
+    })
+
+    socket.on('login', (username) => {
+        socket.set('username', username, err => {
+            if (err) { throw err; }
+            socket.emit('serverMessage', 'Currently logged in as ', username);
+            socket.broadcast.emit('serverMessge', 'User ' + username + ' logged in');
+
+        })
+    })
+})
+
+
 
 //*****************************************************//
 
