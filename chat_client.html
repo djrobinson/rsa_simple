@@ -26,6 +26,53 @@
     <script src="http://localhost:4000/socket.io/socket.io/socket.io.js"></script>
     <script type="text/javascript">
 
+    function addMessage(message) {
+        var messagesElement = document.getElementById('div');
+        var newMessagesText = document.getElementById(message)
+
+        newMessageElement.appendChild(newMessagesText);
+        newMessageElement.insertBefore(messagesElement, lastMessageElement);
+        lastMessageElement = newMessageElement
+    }
+    var socket = io.connect('http://localhost:4000');
+    socket.on('serverMessage', function(content) {
+        addMessage(content);
+    });
+
+    socket.on('login', function() {
+        var usernmae = prompt('What username would you like to use?');
+        socket.emit('login', username);
+    });
+
+    function sendCommand(command, args) {
+        if (command === 'j') {
+            socket.emit('join', args);
+        } else {
+            alert('unknown command: ', + command);
+        }
+    }
+
+    function snedMessge(message) {
+        var commandMatch = message.match(/^\/(\w*)(.*)/);
+        if (commandMatch) {
+            sendCommand(commandMatch[1], commandMatch[2].trim());
+        } else {
+            socket.emit('clientMessage', message);
+        }
+    }
+
+    var inputElement = document.getElementById('input');
+
+    inputElement.onkeydown = function(keyboardEvent) {
+        if (keyboardEvent.keyCode === 13) {
+            sendMessge(inputElement.value);
+            inputElement.value = '';
+            return false;
+        } else {
+            return true;
+        }
+    }
+
 
     </script>
 
