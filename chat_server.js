@@ -154,8 +154,6 @@ server.on('close', () => {
     console.log('Server closed');
 });
 
-//*****************************************************//
-
 //****************** Simple HTTP **********************//
 
 const handler = (req, res) => {
@@ -176,25 +174,28 @@ httpd.listen(4000);
 const io = require('socket.io').listen(httpd);
 
 io.sockets.on('connection', (socket) => {
+    const loggedInUsers = {};
+    let numOfUsers = 0;
+    socket.on('login', (username) => {
+        console.log('Logging In!!!');
+        numOfUsers++;
+        loggedInUsers[socket.id] = username;
+        socket.emit('serverMessage','You have logged in as: '+ username+ ' at Socket '+ socket.id)
+        socket.broadcast.emit('serverMessage','You have logged in as: '+ username+ ' at Socket '+ socket.id)
+    });
+    socket.on('users', () => {
+        socket.emit('serverMessage', 'Logged in users: ' + loggedInUsers);
+        socket.broadcast.emit('serverMessage', 'Logged in users: ' + JSON.stringify(loggedInUsers));
+    })
     socket.on('clientMessage', (content) => {
         console.log('Incoming message', content);
-        socket.emit('serverMessage', 'Your said' + content);
+        const userName = loggedInUsers[socket.id];
+        socket.emit('serverMessage', userName + ' said: ' + content);
+        socket.broadcast.emit('serverMessage', userName + ' said: ' + content);
 
-        socket.on('username', (err, username) => {
-            if (!username) {
-                username = socket.id;
-            }
-        })
     })
 
-    socket.on('login', (username) => {
-        socket.set('username', username, err => {
-            if (err) { throw err; }
-            socket.emit('serverMessage', 'Currently logged in as ', username);
-            socket.broadcast.emit('serverMessge', 'User ' + username + ' logged in');
 
-        })
-    })
 })
 
 

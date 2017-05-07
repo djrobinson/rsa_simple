@@ -50,8 +50,10 @@
     });
 
     function sendCommand(command, args) {
-        if (command === 'j') {
-            socket.emit('join', args);
+        if (command === 'l') {
+            socket.emit('login', args);
+        } else if (command === 'u') {
+            socket.emit('users');
         } else {
             alert('unknown command: ', + command);
         }
