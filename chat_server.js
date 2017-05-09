@@ -76,8 +76,24 @@ const inverseModulus = (a, b) => {
     return x[(i - 1) % 3];
 }
 
+const modularExponent = (b, e, m) => {
+    let remainder;
+    let x = 1;
 
+    while (e !== 0) {
+        remainder = e % 2;
+        e = Math.floor(e / 2);
+        console.log('While loop: ', remainder, e);
+        if (remainder === 1) {
+            x = (x * b) % m;
+        }
+        b = (b * b) % m;
+    }
+    console.log('Module Exponentation X: ', x);
+    return x;
+}
 
+modularExponent(1819, 13, 2537);
 
 const getKeys = () => {
     // Create 2 Prime Numbers
@@ -210,12 +226,9 @@ io.sockets.on('connection', (socket) => {
             socket.emit('serverMessage', 'Please login using "/l" <username>');
         }
     });
-
-
-})
-
-
+});
 
 //*****************************************************//
 
 server.listen(4001);
+
