@@ -178,7 +178,7 @@ io.sockets.on('connection', (socket) => {
     socket.on('login', (username) => {
         numOfUsers++;
         const keys = getKeys();
-        loggedInUsers[socket.id] = {
+        loggedInUsers[username] = {
             keys: keys,
             username
         };
@@ -194,9 +194,12 @@ io.sockets.on('connection', (socket) => {
         const keys = getKeys();
         socket.emit('serverMessage', 'Your Public Key: ' + keys.d + ' and your Private Key (keep secret): ' + keys.n );
     });
+    socket.on('private', (username) => {
+        console.log('Private message', loggedInUsers[username].keys.n);
+    });
     socket.on('clientMessage', (content) => {
         console.log('Incoming message', content);
-        const userName = loggedInUsers[socket.id];
+        const userName = loggedInUsers[username || socket.id];
         socket.emit('serverMessage', userName + ' said: ' + content);
         socket.broadcast.emit('serverMessage', userName + ' said: ' + content);
 
