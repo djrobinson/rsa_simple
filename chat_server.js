@@ -170,13 +170,19 @@ const httpd = http.createServer(handler);
 httpd.listen(4000);
 const io = require('socket.io').listen(httpd);
 
+const loggedInUsers = {};
+
+
 io.sockets.on('connection', (socket) => {
-    const loggedInUsers = {};
     let numOfUsers = 0;
     socket.on('login', (username) => {
-        console.log('Logging In!!!');
         numOfUsers++;
-        loggedInUsers[socket.id] = username;
+        const keys = getKeys();
+        loggedInUsers[socket.id] = {
+            keys: keys,
+            username
+        };
+        console.log('heyoooo', loggedInUsers);
         socket.emit('serverMessage','New user logged in as: '+ username+ ' at Socket '+ socket.id)
         socket.broadcast.emit('serverMessage','You have logged in as: '+ username+ ' at Socket '+ socket.id)
     });
