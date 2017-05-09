@@ -123,8 +123,6 @@ const decrypt = (data) => {
 server.on('connection', (socket) => {
     console.log('new connection');
 
-
-
     sockets.push(socket);
 
     socket.on('data', (data) => {

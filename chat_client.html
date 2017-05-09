@@ -54,6 +54,8 @@
             socket.emit('login', args);
         } else if (command === 'u') {
             socket.emit('users');
+        } else if (command === 'k') {
+            socket.emit('create keys');
         } else {
             alert('unknown command: ', + command);
         }
