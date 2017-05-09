@@ -27,7 +27,6 @@ const generateRelativePrime = (relator, max) => {
     let random = 1;
     while (relator % random === 0) {
         random = generateRandomPrime(max);
-        console.log('Random Relative Test', random);
     }
     if (relator % random !== 0) {
         return random;
@@ -39,7 +38,6 @@ const generateRandomPrime = (max) => {
     let random = 4;
     while (!isPrime(random)) {
         random = Math.floor(Math.random() * max);
-        console.log('Random', random);
     }
     if (isPrime(random)) {
         return random;
@@ -67,16 +65,13 @@ const inverseModulus = (a, b) => {
 
     for (; checkZero(a, b) !== '0'; i++) {
         const checker = math.mod(b, math.mod(a, b));
-        console.log('Checker: ', checker.toString());
         a = b;
         b = remainder;
         quotient = math.floor(math.divide(a, b));
         remainder = math.mod(a, b);
-        console.log('X & Y', x, y, 'Quotient: ', quotient.toString());
         x[math.mod(i, 3)] = (quotient * -1 * x[(i - 1) % 3]) + x[(i - 2) % 3];
         y[math.mod(i, 3)] = (quotient * -1 * y[(i - 1) % 3]) + y[(i - 2) % 3];
     }
-    console.log('X & Y', x, y);
 
     return x[(i - 1) % 3];
 }
@@ -84,8 +79,7 @@ const inverseModulus = (a, b) => {
 
 
 
-const scrambler = (plainText) => {
-    console.log(plainText.toUpperCase());
+const getKeys = () => {
     // Create 2 Prime Numbers
 
     const p = generateRandomPrime(1000);
@@ -102,13 +96,18 @@ const scrambler = (plainText) => {
 
     console.log('P, Q, N, T, E:', p, q, n, t, e);
 
-    const inverseMod = inverseModulus(11, 840);
+    const d = inverseModulus(e, t);
 
-    console.log('Inverse Mod Test:', inverseMod);
+    return {
+        'n': n,
+        'e': e,
+        'd': d
+    }
 
 }
 
-scrambler('Howdy!');
+
+getKeys();
 
 const encrypt = (data) => {
     // C = Me mod n
@@ -180,13 +179,17 @@ io.sockets.on('connection', (socket) => {
         console.log('Logging In!!!');
         numOfUsers++;
         loggedInUsers[socket.id] = username;
-        socket.emit('serverMessage','You have logged in as: '+ username+ ' at Socket '+ socket.id)
+        socket.emit('serverMessage','New user logged in as: '+ username+ ' at Socket '+ socket.id)
         socket.broadcast.emit('serverMessage','You have logged in as: '+ username+ ' at Socket '+ socket.id)
     });
     socket.on('users', () => {
         socket.emit('serverMessage', 'Logged in users: ' + loggedInUsers);
         socket.broadcast.emit('serverMessage', 'Logged in users: ' + JSON.stringify(loggedInUsers));
-    })
+    });
+    socket.on('create keys', () => {
+        const keys = getKeys();
+        socket.emit('serverMessage', 'Your Public Key: ' + keys.d + ' and your Private Key (keep secret): ' + keys.n );
+    });
     socket.on('clientMessage', (content) => {
         console.log('Incoming message', content);
         const userName = loggedInUsers[socket.id];
