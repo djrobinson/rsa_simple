@@ -172,38 +172,44 @@ const io = require('socket.io').listen(httpd);
 
 const loggedInUsers = {};
 
+const socketUserMapper = {};
+
 
 io.sockets.on('connection', (socket) => {
     let numOfUsers = 0;
     socket.on('login', (username) => {
         numOfUsers++;
         const keys = getKeys();
-        loggedInUsers[username] = {
+        socketUserMapper[username] = socket.id;
+        loggedInUsers[socket.id] = {
             keys: keys,
             username
         };
         console.log('heyoooo', loggedInUsers);
-        socket.emit('serverMessage','New user logged in as: '+ username+ ' at Socket '+ socket.id)
-        socket.broadcast.emit('serverMessage','You have logged in as: '+ username+ ' at Socket '+ socket.id)
+        socket.emit('serverMessage','You have logged in as: '+ username+ ' at Socket '+ socket.id)
+        socket.broadcast.emit('serverMessage','A new user has logged in as: '+ username+ ' at Socket '+ socket.id)
     });
     socket.on('users', () => {
         socket.emit('serverMessage', 'Logged in users: ' + loggedInUsers);
-        socket.broadcast.emit('serverMessage', 'Logged in users: ' + JSON.stringify(loggedInUsers));
+        socket.broadcast.emit('serverMessage', 'Logged in users: ' + JSON.parse(loggedInUsers));
     });
     socket.on('create keys', () => {
         const keys = getKeys();
         socket.emit('serverMessage', 'Your Public Key: ' + keys.d + ' and your Private Key (keep secret): ' + keys.n );
     });
-    socket.on('private', (username) => {
+    socket.on('private', (username, message) => {
         console.log('Private message', loggedInUsers[username].keys.n);
     });
     socket.on('clientMessage', (content) => {
-        console.log('Incoming message', content);
-        const userName = loggedInUsers[username || socket.id];
-        socket.emit('serverMessage', userName + ' said: ' + content);
-        socket.broadcast.emit('serverMessage', userName + ' said: ' + content);
-
-    })
+        console.log('Incoming message', socket.username);
+        if (loggedInUsers[socket.id]) {
+            const userName = loggedInUsers[socket.id].username;
+            socket.emit('serverMessage', userName + ' said: ' + content);
+            socket.broadcast.emit('serverMessage', userName + ' said: ' + content);
+        } else {
+            socket.emit('serverMessage', 'Please login using "/l" <username>');
+        }
+    });
 
 
 })
