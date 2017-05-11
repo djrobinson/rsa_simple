@@ -3,7 +3,6 @@ const math = require('mathjs');
 const http = require('http');
 const fs = require('fs');
 
-
 math.config({
     number: 'BigNumber',
     precision: 64
@@ -91,6 +90,11 @@ const modularExponent = (b, e, m) => {
     }
     console.log('Module Exponentation X: ', x);
     return x;
+}
+
+const toAscii = (char) => {
+    const asciiChar = char.charCodeAt(0);
+    return asciiChar;
 }
 
 modularExponent(1819, 13, 2537);
@@ -201,7 +205,6 @@ io.sockets.on('connection', (socket) => {
             keys: keys,
             username
         };
-        console.log('heyoooo', loggedInUsers);
         socket.emit('serverMessage','You have logged in as: '+ username+ ' at Socket '+ socket.id)
         socket.broadcast.emit('serverMessage','A new user has logged in as: '+ username+ ' at Socket '+ socket.id)
     });
@@ -214,7 +217,13 @@ io.sockets.on('connection', (socket) => {
         socket.emit('serverMessage', 'Your Public Key: ' + keys.d + ' and your Private Key (keep secret): ' + keys.n );
     });
     socket.on('private', (username, message) => {
-        console.log('Private message', loggedInUsers[username].keys.n);
+        console.log('Private: ', username, message, loggedInUsers);
+        const asciiChar = toAscii('t');
+        const keys = loggedInUsers[socket.id].keys;
+        const encrypted = modularExponent(asciiChar, keys.e, keys.n)
+        console.log('Private message', encrypted);
+        socket.emit('serverMessage','You sent an encrypted message: '+ encrypted);
+        socket.broadcast.emit('serverMessage','A user has published an encrypted message '+ encrypted)
     });
     socket.on('clientMessage', (content) => {
         console.log('Incoming message', socket.username);
