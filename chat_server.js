@@ -223,7 +223,8 @@ io.sockets.on('connection', (socket) => {
         const encrypted = modularExponent(asciiChar, keys.e, keys.n)
         console.log('Private message', encrypted);
         socket.emit('serverMessage','You sent an encrypted message: '+ encrypted);
-        socket.broadcast.emit('serverMessage','A user has published an encrypted message '+ encrypted)
+        socket.broadcast.emit('serverMessage','A user has published an encrypted message '+ encryp
+             )
     });
     socket.on('clientMessage', (content) => {
         console.log('Incoming message', socket.username);

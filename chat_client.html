@@ -58,6 +58,8 @@
             socket.emit('create keys');
         } else if (command === 'p') {
             socket.emit('private', args);
+        } else if (command === 'e') {
+            socket.emit('encrypt', args);
         } else {
             alert('unknown command: ', + command);
         }
